@@ -145,8 +145,6 @@ export default defineComponent({
                 }
                 toastr.success("Giriş Başarılı, yönlendiriliyorsunuz...");
             } else {
-                console.log('------------ LOGIN RESPONSE --------------');
-                console.log(loginResponse)
                 if (submitButton.value) {
                     submitButton.value!.disabled = false;
                     submitButton.value.setAttribute("data-kt-indicator", "off");

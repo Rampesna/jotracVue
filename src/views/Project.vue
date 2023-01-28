@@ -1,5 +1,6 @@
 <template>
 
+    <CreateProjectModal ref="CreateProjectModalReference"></CreateProjectModal>
 
     <div class="row">
         <div class="col-xl-12 mb-5">
@@ -34,6 +35,21 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-xl-6">
+                            <div class="row">
+                                <div class="col-xl-6"></div>
+                                <div class="col-xl-6 text-end mt-5">
+                                    <button
+                                        class="btn btn-success"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#CreateProjectModal"
+                                        @click="this.$refs.CreateProjectModalReference.onCreateProjectModalOpen()"
+                                    >
+                                        Yeni Proje Oluştur
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -42,18 +58,20 @@
     <hr class="text-muted">
     <div class="row">
         <div v-for="(project, i) in projects" class="col-sm-12 col-md-6 col-lg-4 col-xl-2 mb-5">
-            <div class="card border-hover-primary align-items-center">
-                <div class="card-header border-0 pt-9 d-flex">
-                    <div class="card-title m-0">
-                        <a class="symbol symbol-50px w-50px bg-light">
-                            <img src="public/media/svg/brand-logos/xing-icon.svg" alt="image" class="p-3">
-                        </a>
+            <router-link :to="{name: 'projectOverview'}">
+                <div class="card border-hover-primary align-items-center">
+                    <div class="card-header border-0 pt-9 d-flex">
+                        <div class="card-title m-0">
+                            <a class="symbol symbol-50px w-50px bg-light">
+                                <img src="public/media/svg/brand-logos/xing-icon.svg" alt="image" class="p-3">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-9">
+                        <a class="fs-3 fw-bolder text-dark">{{ project.name }}</a>
                     </div>
                 </div>
-                <div class="card-body p-9">
-                    <a class="fs-3 fw-bolder text-dark">{{ project.name }}</a>
-                </div>
-            </div>
+            </router-link>
         </div>
     </div>
 
@@ -64,8 +82,12 @@
 import ProjectService from "@/services/ProjectService";
 // @ts-ignore
 import  { io } from "socket.io-client";
+import CreateProjectModal from "@/views/components/CreateProjectModal.vue";
 export default {
     name: "Project",
+    components: {
+        CreateProjectModal
+    },
     data() {
         return {
             projects: [
@@ -79,6 +101,7 @@ export default {
             statuses: [],
             selectedStatuses: [],
             selectedKeyword: "",
+            showModal: false,
         };
     },
     methods: {
@@ -100,11 +123,30 @@ export default {
     },
     setup() {
         const socket = io('http://127.0.0.1:3001');
-        socket.emit('message', 'test');
-        socket.on('message', (data) => {
+        socket.emit('updateProject', 'test');
+        socket.emit('updateBoard', 'test');
+        socket.emit('updateTask', 'test');
+        socket.emit('updateSubTask', 'test');
+
+        socket.on('onProjectUpdate', (data) => {
             console.log(data);
         });
-    }
+
+        socket.on('onBoardUpdate', (data) => {
+            console.log(data);
+        });
+
+        socket.on('onTaskUpdate', (data) => {
+            console.log(data);
+        });
+
+        socket.on('onSubTaskUpdate', (data) => {
+            console.log(data);
+        });
+    },
+    // emits: [
+    //     'getProjects'
+    // ]
 }
 </script>
 <style>

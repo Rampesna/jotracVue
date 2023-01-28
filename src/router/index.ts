@@ -33,6 +33,18 @@ const routes = [
                     // breadcrumbs: ["Projeler"],
                 },
             },
+            {
+                path: "/project/overview",
+                name: "projectOverview",
+                component: () => import("@/views/ProjectOverview.vue"),
+                meta: {
+                    pageTitle: "Proje Önizleme",
+                    breadcrumbs: ["Projeler"],
+                },
+                children: [
+
+                ],
+            },
         ],
     },
 

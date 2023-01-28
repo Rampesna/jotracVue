@@ -6,6 +6,7 @@ class ApiEndpoints {
     static GET_PROFILE = '/user/getProfile';
 
     static GET_PROJECT_BY_USER = '/project/getByUser';
+    static CREATE_PROJECT = '/project/create';
 }
 
 export default ApiEndpoints;

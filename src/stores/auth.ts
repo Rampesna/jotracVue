@@ -6,14 +6,7 @@ import AuthService from "@/services/AuthService";
 // @ts-ignore
 import ServiceResponse from "@/core/helpers/ServiceResponse";
 import UserService from "@/core/services/UserService";
-
-export interface User {
-    name: string;
-    surname?: string;
-    email: string;
-    password: string;
-    api_token?: string;
-}
+import type {User} from "@/stores/interfaces/user";
 
 export const useAuthStore = defineStore("auth", () => {
     const errors = ref({});

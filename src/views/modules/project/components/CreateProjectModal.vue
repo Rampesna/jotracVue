@@ -81,6 +81,9 @@ import toastr from "toastr";
 import ProjectService from "@/services/ProjectService";
 export default {
     name: "CreateProjectModal",
+    emits: [
+        'onProjectCreated'
+    ],
     components: {
 
     },
@@ -116,7 +119,7 @@ export default {
                 if (createProjectResponse.Success) {
                     toastr.success(createProjectResponse.Message);
                     CancelCreateProjectButton.click();
-                    this.$emit('getProjects');
+                    this.$emit('onProjectCreated');
                 } else {
                     toastr.error(createProjectResponse.Message);
                 }

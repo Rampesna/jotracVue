@@ -1,6 +1,6 @@
 <template>
 
-    <CreateProjectModal ref="CreateProjectModalReference"></CreateProjectModal>
+    <CreateProjectModal ref="CreateProjectModalReference" @onProjectCreated="getProjects"></CreateProjectModal>
 
     <div class="row">
         <div class="col-xl-12 mb-5">
@@ -58,12 +58,12 @@
     <hr class="text-muted">
     <div class="row">
         <div v-for="(project, i) in projects" class="col-sm-12 col-md-6 col-lg-4 col-xl-2 mb-5">
-            <router-link :to="{name: 'projectOverview'}">
+            <router-link :to="{name: 'projectOverview', params: {encryptedId: encrypt(project.id.toString(), md5(getToken()))}}">
                 <div class="card border-hover-primary align-items-center">
                     <div class="card-header border-0 pt-9 d-flex">
                         <div class="card-title m-0">
                             <a class="symbol symbol-50px w-50px bg-light">
-                                <img src="public/media/svg/brand-logos/xing-icon.svg" alt="image" class="p-3">
+                                <img src="../../../../public/media/svg/brand-logos/xing-icon.svg" alt="image" class="p-3">
                             </a>
                         </div>
                     </div>
@@ -82,7 +82,11 @@
 import ProjectService from "@/services/ProjectService";
 // @ts-ignore
 import  { io } from "socket.io-client";
-import CreateProjectModal from "@/views/components/CreateProjectModal.vue";
+import CreateProjectModal from "@/views/modules/project/components/CreateProjectModal.vue";
+import {encrypt} from "@/core/helpers/crypto";
+import {getToken} from "@/core/services/JwtService";
+import md5 from "md5";
+
 export default {
     name: "Project",
     components: {
@@ -90,14 +94,7 @@ export default {
     },
     data() {
         return {
-            projects: [
-                {
-                    id: 1,
-                    name: 'Test 1',
-                    progress: 75,
-                    waitingTicketsCount: 7,
-                }
-            ],
+            projects: [],
             statuses: [],
             selectedStatuses: [],
             selectedKeyword: "",
@@ -105,6 +102,7 @@ export default {
         };
     },
     methods: {
+        encrypt,
         async getProjects() {
             // @ts-ignore
             let projectsResponse = await ProjectService.getByUser();
@@ -143,6 +141,11 @@ export default {
         socket.on('onSubTaskUpdate', (data) => {
             console.log(data);
         });
+
+        return {
+            getToken,
+            md5
+        }
     },
     // emits: [
     //     'getProjects'

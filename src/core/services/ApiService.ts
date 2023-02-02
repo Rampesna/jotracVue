@@ -71,6 +71,18 @@ class ApiService {
     }
 
     /**
+     * @description send the GET HTTP request
+     * @param resource: string
+     * @param params: AxiosRequestConfig
+     * @returns Promise<AxiosResponse>
+     */
+    public static getWithBody(resource: string, params: any): Promise<AxiosResponse> {
+        return ApiService.vueInstance.axios.get(`${resource}`, {
+            params: params
+        });
+    }
+
+    /**
      * @description set the POST HTTP request
      * @param resource: string
      * @param params: AxiosRequestConfig

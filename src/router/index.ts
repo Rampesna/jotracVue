@@ -18,7 +18,7 @@ const routes = [
             {
                 path: "/dashboard",
                 name: "dashboard",
-                component: () => import("@/views/Dashboard.vue"),
+                component: () => import("@/views/modules/dashboard/Dashboard.vue"),
                 meta: {
                     pageTitle: "Anasayfa",
                     breadcrumbs: ["Kontrol Paneli"],
@@ -27,24 +27,85 @@ const routes = [
             {
                 path: "/project",
                 name: "project",
-                component: () => import("@/views/Project.vue"),
+                component: () => import("@/views/modules/project/Project.vue"),
                 meta: {
                     pageTitle: "Projeler",
                     // breadcrumbs: ["Projeler"],
                 },
             },
             {
-                path: "/project/overview",
+                path: "/project/overview/:encryptedId",
                 name: "projectOverview",
-                component: () => import("@/views/ProjectOverview.vue"),
+                component: () => import("@/views/modules/project/modules/Overview.vue"),
                 meta: {
-                    pageTitle: "Proje Önizleme",
+                    pageTitle: "",
                     breadcrumbs: ["Projeler"],
                 },
+                props: true,
+                children: [
+                    // {
+                    //     name:'projectOverview/Edit',
+                    //     path: "projectOverview/Edit/:id", // :id mi bana lazım olan kısım sadece bu muydu la? Evet
+                    //     meta :{
+                    //         pageTitle: "Projeler Düzenleme / Sen düzeltirsin :D",
+                    //     },
+                    //     component: () => import("@/views/modules/project/modules/Overview.vue"),// componenti değiştirmen lazım
+                    //     // o zaman bi sn hiç componenti değişmeye gerek yokda şöyle bi ufak düzenleme lazım deneyeyim hemen canlı canlı :D
+                    // }
+                ],
+            },
+            {
+                path: "/project/boards/:encryptedId",
+                name: "projectBoards",
+                component: () => import("@/views/modules/project/modules/Boards.vue"),
+                meta: {
+                    pageTitle: "",
+                    breadcrumbs: ["Projeler"],
+                },
+                props: true,
                 children: [
 
                 ],
             },
+            {
+                path: "/project/notes/:encryptedId",
+                name: "projectNotes",
+                component: () => import("@/views/modules/project/modules/Notes.vue"),
+                meta: {
+                    pageTitle: "",
+                    breadcrumbs: ["Projeler"],
+                },
+                props: true,
+                children: [
+
+                ],
+            },
+            {
+                path: "/project/files/:encryptedId",
+                name: "projectFiles",
+                component: () => import("@/views/modules/project/modules/Files.vue"),
+                meta: {
+                    pageTitle: "",
+                    breadcrumbs: ["Projeler"],
+                },
+                props: true,
+                children: [
+
+                ],
+            },
+            {
+                path: "/project/tickets/:encryptedId",
+                name: "projectTickets",
+                component: () => import("@/views/modules/project/modules/Tickets.vue"),
+                meta: {
+                    pageTitle: "",
+                    breadcrumbs: ["Projeler"],
+                },
+                props: true,
+                children: [
+
+                ],
+            }
         ],
     },
 

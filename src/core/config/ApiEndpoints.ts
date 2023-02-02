@@ -6,6 +6,7 @@ class ApiEndpoints {
     static GET_PROFILE = '/user/getProfile';
 
     static GET_PROJECT_BY_USER = '/project/getByUser';
+    static GET_PROJECT_BY_ID = '/project/getById';
     static CREATE_PROJECT = '/project/create';
 }
 

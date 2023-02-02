@@ -22,6 +22,28 @@ class ProjectService implements IProjectService {
     }
 
     // @ts-ignore
+    async getById(
+        id: number
+    ): Promise<ServiceResponse> {
+        ApiService.setHeader();
+        // @ts-ignore
+        let response = await ApiService.getWithBody(ApiEndpoints.GET_PROJECT_BY_ID, {
+            id: id
+        });
+
+        return new ServiceResponse(
+            // @ts-ignore
+            response.coreResponse.success,
+            // @ts-ignore
+            response.coreResponse.message,
+            // @ts-ignore
+            response.coreResponse.data,
+            // @ts-ignore
+            response.coreResponse.status
+        );
+    }
+
+    // @ts-ignore
     async create(
         name: string,
         startDate?: Date,

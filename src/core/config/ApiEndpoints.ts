@@ -8,6 +8,11 @@ class ApiEndpoints {
     static GET_PROJECT_BY_USER = '/project/getByUser';
     static GET_PROJECT_BY_ID = '/project/getById';
     static CREATE_PROJECT = '/project/create';
+
+    static GET_BOARD_WITH_TASKS_BY_PROJECT_ID = '/board/getByProjectIdWithTasks';
+    static CREATE_BOARD = '/board/create';
+
+    static CREATE_TASK = '/task/create';
 }
 
 export default ApiEndpoints;

@@ -107,7 +107,8 @@
 <script lang="ts">
 import {defineComponent, ref} from "vue";
 import {ErrorMessage, Field, Form as VForm} from "vee-validate";
-import {useAuthStore, type User} from "@/stores/auth";
+import {useAuthStore} from "@/stores/auth";
+import type {User} from "@/stores/interfaces/user";
 import {useRouter} from "vue-router";
 // @ts-ignore
 import toastr from "toastr";

@@ -34,7 +34,7 @@ const routes = [
                 },
             },
             {
-                path: "/project/overview/:encryptedId",
+                path: "/project/:encryptedId/overview",
                 name: "projectOverview",
                 component: () => import("@/views/modules/project/modules/Overview.vue"),
                 meta: {
@@ -55,7 +55,7 @@ const routes = [
                 ],
             },
             {
-                path: "/project/boards/:encryptedId",
+                path: "/project/:encryptedId/boards",
                 name: "projectBoards",
                 component: () => import("@/views/modules/project/modules/Boards.vue"),
                 meta: {
@@ -68,7 +68,7 @@ const routes = [
                 ],
             },
             {
-                path: "/project/notes/:encryptedId",
+                path: "/project/:encryptedId/notes",
                 name: "projectNotes",
                 component: () => import("@/views/modules/project/modules/Notes.vue"),
                 meta: {
@@ -81,7 +81,7 @@ const routes = [
                 ],
             },
             {
-                path: "/project/files/:encryptedId",
+                path: "/project/:encryptedId/files",
                 name: "projectFiles",
                 component: () => import("@/views/modules/project/modules/Files.vue"),
                 meta: {
@@ -94,7 +94,7 @@ const routes = [
                 ],
             },
             {
-                path: "/project/tickets/:encryptedId",
+                path: "/project/:encryptedId/tickets",
                 name: "projectTickets",
                 component: () => import("@/views/modules/project/modules/Tickets.vue"),
                 meta: {

@@ -11,6 +11,7 @@ class ApiEndpoints {
 
     static GET_BOARD_WITH_TASKS_BY_PROJECT_ID = '/board/getByProjectIdWithTasks';
     static CREATE_BOARD = '/board/create';
+    static UPDATE_BOARD = '/board/update';
 
     static CREATE_TASK = '/task/create';
 }

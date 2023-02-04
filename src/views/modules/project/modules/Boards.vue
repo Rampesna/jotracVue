@@ -15,7 +15,7 @@
                                             <i class="far fa-circle fa-sm mt-5"></i>
                                         </div>
                                         <div class="col-xl-9">
-                                            <input data-id="62" class="form-control font-weight-bold moveTaskIcon updateBoardTitle" type="text" :value="board.name" style="color:gray; font-size: 15px; border: none; background: transparent">
+                                            <input data-id="62" class="form-control font-weight-bold moveTaskIcon updateBoardTitle" type="text" @keypress.enter="updateBoard(board.id, $event)" @focusout="updateBoard(board.id, $event)" :value="board.name" style="color:gray; font-size: 15px; border: none; background: transparent">
                                         </div>
                                         <div class="col-xl-1 mt-2 align-items-end">
                                             <div class="dropdown">
@@ -114,8 +114,12 @@ export default {
         let boardsResponse = await BoardService.getByProjectIdWithTasks(this.projectId);
 
         if (boardsResponse.Success) {
+            let boards = boardsResponse.Data;
+            boards.forEach((board, index) => {
+                boards[index].tasks = board.tasks.sort((a, b) => a.order - b.order);
+            });
             // @ts-ignore
-            this.boards = boardsResponse.Data;
+            this.boards = boards;
         } else {
             console.log(boardsResponse);
         }
@@ -132,6 +136,20 @@ export default {
                 this.boards.push(createBoardResponse.Data);
             } else {
                 console.log(createBoardResponse);
+            }
+        },
+        async updateBoard(boardId, event) {
+            if (!event.target.value) {
+                toastr.warning('Pano adı boş olamaz!');
+            } else {
+                let updateBoardResponse = await BoardService.update(
+                    boardId,
+                    event.target.value
+                );
+
+                if (!updateBoardResponse.Success) {
+                    console.log(updateBoardResponse);
+                }
             }
         },
         async addTask(boardId, event) {

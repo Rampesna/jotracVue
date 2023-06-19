@@ -12,8 +12,10 @@ class ApiEndpoints {
     static GET_BOARD_WITH_TASKS_BY_PROJECT_ID = '/board/getByProjectIdWithTasks';
     static CREATE_BOARD = '/board/create';
     static UPDATE_BOARD = '/board/update';
+    static UPDATE_BOARD_ORDER = '/board/updateOrder';
 
     static CREATE_TASK = '/task/create';
+    static UPDATE_TASK_ORDER = '/task/updateOrder';
 }
 
 export default ApiEndpoints;

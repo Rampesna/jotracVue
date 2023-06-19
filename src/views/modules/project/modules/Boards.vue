@@ -6,8 +6,8 @@
         <div class="col-xl-12">
             <div class="row">
                 <div class="col-xl-12">
-                    <draggable group="allBoards">
-                        <div v-for="(board, i) in boards" @dragend="onBoardDragEnd" class="kanban-board" :key="board.id">
+                    <draggable v-if="boards.length > 0" :key="boards.length" group="allBoards">
+                        <div v-for="(board, i) in boards" @dragend="onBoardDragEnd($event)" class="kanban-board" :id="board.id">
                             <header class="kanban-board-header">
                                 <div class="kanban-title-board">
                                     <div class="row">
@@ -32,24 +32,23 @@
                                 </div>
                             </header>
                             <main class="kanban-drag">
-                                <draggable group="allTasks">
-                                    <div v-for="(task, j) in board.tasks" class="kanban-item border border-danger bg-light" data-eid="82">
+                                <draggable group="allTasks" :board-id="board.id" @dragstart="onTaskDragStart($event)" @dragend="onTaskDragEnd($event)">
+                                    <div v-for="(task, j) in board.tasks" class="kanban-item border border-danger bg-light" :board-id="board.id" :id="task.id">
                                         <div class="row">
                                             <div class="col-xl-10">
                                                 <i class="fa fa-check-circle text-success"></i>
-                                                <span data-id="82" class="taskTitle cursor-pointer ms-2">{{ task.name }}</span>
+                                                <span class="taskTitle cursor-pointer ms-2">{{ task.name }}</span>
                                             </div>
                                             <div class="col-xl-1 text-right">
-                                                <i class="fas fa-sort-amount-down cursor-pointer sublistToggleIcon" data-id="82"></i>
+                                                <i class="fas fa-sort-amount-down cursor-pointer sublistToggleIcon" :id="task.id"></i>
                                             </div>
                                         </div>
-                                        <div id="sublist_82" class="taskSublist">
+                                        <div class="taskSublist">
 
                                         </div>
                                     </div>
                                 </draggable>
-                                <div class="opacity-70 mt-8" data-eid="board_62_task_adder"
-                                     data-class="opacity-60">
+                                <div class="opacity-70 mt-8" data-class="opacity-60">
                                     <div class="row mt-n3 mb-n3 taskAdderSelector">
                                         <div class="col-xl-12 pl-1 pr-0">
                                             <input @keypress.enter="addTask(board.id, $event)" type="text" class="form-control form-control border-0" placeholder="+ Görev Ekle">
@@ -91,7 +90,7 @@ import {decrypt} from "@/core/helpers/crypto";
 import {getToken} from "@/core/services/JwtService";
 import BoardService from "@/services/BoardService";
 import TaskService from "@/services/TaskService";
-import { VueDraggableNext } from 'vue-draggable-next';
+import {VueDraggableNext} from 'vue-draggable-next';
 import toastr from "toastr";
 
 export default {
@@ -103,28 +102,34 @@ export default {
     },
     data() {
         return {
+            taskDraggingOldBoardId: null,
+            taskDraggingNewBoardId: null,
             projectId: null,
             boards: [],
         }
     },
     async mounted() {
         // @ts-ignore
-        this.projectId = decrypt(this.encryptedId, md5(getToken()));
-        // @ts-ignore
-        let boardsResponse = await BoardService.getByProjectIdWithTasks(this.projectId);
-
-        if (boardsResponse.Success) {
-            let boards = boardsResponse.Data;
-            boards.forEach((board, index) => {
-                boards[index].tasks = board.tasks.sort((a, b) => a.order - b.order);
-            });
-            // @ts-ignore
-            this.boards = boards;
-        } else {
-            console.log(boardsResponse);
-        }
+        this.boards = await this.getAllBoards();
     },
     methods: {
+        async getAllBoards() {
+            // @ts-ignore
+            this.projectId = decrypt(this.encryptedId, md5(getToken()));
+            // @ts-ignore
+            let boardsResponse = await BoardService.getByProjectIdWithTasks(this.projectId);
+
+            if (boardsResponse.Success) {
+                let boards = boardsResponse.Data;
+                boards.forEach((board, index) => {
+                    boards[index].tasks = board.tasks.sort((a, b) => a.order - b.order);
+                });
+                // @ts-ignore
+                return boards;
+            } else {
+                console.log(boardsResponse);
+            }
+        },
         async addBoard() {
             let createBoardResponse = await BoardService.create(
                 // @ts-ignore
@@ -175,13 +180,143 @@ export default {
                 }
             }
         },
-        onBoardDragEnd() {
-            let getAllBoards = document.querySelectorAll('.kanban-board');
-            getAllBoards.forEach((board, index) => {
-                let boardKey = board.getAttribute('data-id');
-                console.log(boardKey);
+        async onBoardDragEnd(event) {
+            let allBoards = document.querySelectorAll('.kanban-board');
+            let newBoardOrderList = [];
+            allBoards.forEach((board, index) => {
+                let boardId = board.getAttribute('id');
+                if (boardId) {
+                    newBoardOrderList.push({
+                        // @ts-ignore
+                        boardId: boardId,
+                        // @ts-ignore
+                        order: index
+                    });
+                }
             });
-        }
+
+            // @ts-ignore
+            await BoardService.updateOrder(newBoardOrderList);
+        },
+        async onTaskDragStart(event) {
+
+            // @ts-ignore
+            this.taskDraggingOldBoardId = event.srcElement.parentNode.getAttribute('board-id');
+        },
+        async onTaskDragEnd(event) {
+            event.stopPropagation();
+            // @ts-ignore
+            this.taskDraggingNewBoardId = event.srcElement.parentNode.getAttribute('board-id');
+
+            let allBoards = document.querySelectorAll('.kanban-board');
+
+            // @ts-ignore
+            if (this.taskDraggingOldBoardId === this.taskDraggingNewBoardId) {
+                // @ts-ignore
+                let boardId = this.taskDraggingOldBoardId;
+                let getBoard = null;
+                allBoards.forEach(function (board, index) {
+                    // @ts-ignore
+                    if (board.getAttribute('id') === boardId) {
+                        // @ts-ignore
+                        getBoard = board;
+                    }
+                });
+
+                // @ts-ignore
+                let boardTasks = getBoard.querySelectorAll('.kanban-item');
+                let newTaskOrderList = [];
+                boardTasks.forEach((task, index) => {
+                    let taskId = task.getAttribute('id');
+                    if (taskId) {
+                        newTaskOrderList.push({
+                            // @ts-ignore
+                            taskId: taskId,
+                            // @ts-ignore
+                            boardId: boardId,
+                            // @ts-ignore
+                            order: index
+                        });
+                    }
+                });
+
+                // @ts-ignore
+                await TaskService.updateOrder(newTaskOrderList);
+            } else {
+                // @ts-ignore
+                let oldBoardId = this.taskDraggingOldBoardId;
+                // @ts-ignore
+                let newBoardId = this.taskDraggingNewBoardId;
+
+                let oldBoard = null;
+                allBoards.forEach(function (board, index) {
+                    // @ts-ignore
+                    if (board.getAttribute('id') === oldBoardId) {
+                        // @ts-ignore
+                        oldBoard = board;
+                    }
+                });
+
+                // @ts-ignore
+                let oldBoardTasks = oldBoard.querySelectorAll('.kanban-item');
+                let newTaskOrderListForOldBoard = [];
+                oldBoardTasks.forEach((task, index) => {
+                    let taskId = task.getAttribute('id');
+                    if (taskId) {
+                        newTaskOrderListForOldBoard.push({
+                            // @ts-ignore
+                            taskId: taskId,
+                            // @ts-ignore
+                            boardId: oldBoardId,
+                            // @ts-ignore
+                            order: index
+                        });
+                    }
+                });
+
+                // @ts-ignore
+                await TaskService.updateOrder(newTaskOrderListForOldBoard);
+
+                let newBoard = null;
+                allBoards.forEach(function (board, index) {
+                    // @ts-ignore
+                    if (board.getAttribute('id') === newBoardId) {
+                        // @ts-ignore
+                        newBoard = board;
+                    }
+                });
+
+                // @ts-ignore
+                let newBoardTasks = newBoard.querySelectorAll('.kanban-item');
+                let newTaskOrderListForNewBoard = [];
+                newBoardTasks.forEach((task, index) => {
+                    let taskId = task.getAttribute('id');
+                    if (taskId) {
+                        newTaskOrderListForNewBoard.push({
+                            // @ts-ignore
+                            taskId: taskId,
+                            // @ts-ignore
+                            boardId: newBoardId,
+                            // @ts-ignore
+                            order: index
+                        });
+                    }
+                });
+
+                // @ts-ignore
+                await TaskService.updateOrder(newTaskOrderListForNewBoard);
+            }
+
+            // @ts-ignore
+            this.taskDraggingOldBoardId = null;
+            // @ts-ignore
+            this.taskDraggingNewBoardId = null;
+
+            // // @ts-ignore
+            // this.boards = [];
+            // // @ts-ignore
+            // this.boards = await this.getAllBoards();
+        },
     },
     components: {
         Heading,

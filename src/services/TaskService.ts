@@ -26,6 +26,27 @@ class TaskService implements ITaskService {
             response.coreResponse.status
         );
     }
+
+    // @ts-ignore
+    async updateOrder(
+        tasks: []
+    ): Promise<ServiceResponse> {
+        ApiService.setHeader();
+        let response = await ApiService.put(ApiEndpoints.UPDATE_TASK_ORDER, {
+            tasks: tasks
+        });
+
+        return new ServiceResponse(
+            // @ts-ignore
+            response.coreResponse.success,
+            // @ts-ignore
+            response.coreResponse.message,
+            // @ts-ignore
+            response.coreResponse.data,
+            // @ts-ignore
+            response.coreResponse.status
+        );
+    }
 }
 
 export default new TaskService;

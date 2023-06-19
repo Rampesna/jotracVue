@@ -66,6 +66,27 @@ class BoardService implements IBoardService {
             response.coreResponse.status
         );
     }
+
+    // @ts-ignore
+    async updateOrder(
+        boards: []
+    ): Promise<ServiceResponse> {
+        ApiService.setHeader();
+        let response = await ApiService.put(ApiEndpoints.UPDATE_BOARD_ORDER, {
+            boards: boards
+        });
+
+        return new ServiceResponse(
+            // @ts-ignore
+            response.coreResponse.success,
+            // @ts-ignore
+            response.coreResponse.message,
+            // @ts-ignore
+            response.coreResponse.data,
+            // @ts-ignore
+            response.coreResponse.status
+        );
+    }
 }
 
 export default new BoardService;

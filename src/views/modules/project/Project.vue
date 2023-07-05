@@ -120,28 +120,6 @@ export default {
         this.getProjects();
     },
     setup() {
-        const socket = io('http://127.0.0.1:3001');
-        socket.emit('updateProject', 'test');
-        socket.emit('updateBoard', 'test');
-        socket.emit('updateTask', 'test');
-        socket.emit('updateSubTask', 'test');
-
-        socket.on('onProjectUpdate', (data) => {
-            console.log(data);
-        });
-
-        socket.on('onBoardUpdate', (data) => {
-            console.log(data);
-        });
-
-        socket.on('onTaskUpdate', (data) => {
-            console.log(data);
-        });
-
-        socket.on('onSubTaskUpdate', (data) => {
-            console.log(data);
-        });
-
         return {
             getToken,
             md5

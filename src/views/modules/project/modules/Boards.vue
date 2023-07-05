@@ -92,6 +92,8 @@ import BoardService from "@/services/BoardService";
 import TaskService from "@/services/TaskService";
 import {VueDraggableNext} from 'vue-draggable-next';
 import toastr from "toastr";
+import {io} from "socket.io-client";
+import SocketIoService from "@/core/services/SocketIoService";
 
 export default {
     props: {
@@ -104,8 +106,26 @@ export default {
         return {
             taskDraggingOldBoardId: null,
             taskDraggingNewBoardId: null,
+            SocketService: null,
             projectId: null,
             boards: [],
+        }
+    },
+    created() {
+        SocketIoService.connect();
+
+        SocketIoService.listen('onBoardUpdate',  async (data) => {
+            // @ts-ignore
+            this.boards = await this.getAllBoards();
+        });
+    },
+    setup() {
+        let SocketService = io('http://localhost:3001');
+
+        return {
+            SocketService,
+            getToken,
+            md5
         }
     },
     async mounted() {
@@ -139,6 +159,9 @@ export default {
             if (createBoardResponse.Success) {
                 // @ts-ignore
                 this.boards.push(createBoardResponse.Data);
+
+                // @ts-ignore
+                SocketIoService.emit('updateBoard');
             } else {
                 console.log(createBoardResponse);
             }
@@ -154,6 +177,9 @@ export default {
 
                 if (!updateBoardResponse.Success) {
                     console.log(updateBoardResponse);
+                } else {
+                    // @ts-ignore
+                    SocketIoService.emit('updateBoard');
                 }
             }
         },
@@ -167,14 +193,17 @@ export default {
                 );
 
                 if (createTaskResponse.Success) {
+                    // // @ts-ignore
+                    // this.boards.forEach((board, index) => {
+                    //     if (board.id === boardId) {
+                    //         // @ts-ignore
+                    //         this.boards[index].tasks.push(createTaskResponse.Data);
+                    //     }
+                    // });
+                    // event.target.value = '';
+
                     // @ts-ignore
-                    this.boards.forEach((board, index) => {
-                        if (board.id === boardId) {
-                            // @ts-ignore
-                            this.boards[index].tasks.push(createTaskResponse.Data);
-                        }
-                    });
-                    event.target.value = '';
+                    SocketIoService.emit('updateBoard');
                 } else {
                     console.log(createTaskResponse);
                 }
@@ -196,10 +225,15 @@ export default {
             });
 
             // @ts-ignore
-            await BoardService.updateOrder(newBoardOrderList);
+            let updateOrderResponse = await BoardService.updateOrder(newBoardOrderList);
+
+            if (updateOrderResponse.Success) {
+                console.log(updateOrderResponse);
+                // @ts-ignore
+                SocketIoService.emit('updateBoard');
+            }
         },
         async onTaskDragStart(event) {
-
             // @ts-ignore
             this.taskDraggingOldBoardId = event.srcElement.parentNode.getAttribute('board-id');
         },
@@ -241,7 +275,17 @@ export default {
                 });
 
                 // @ts-ignore
-                await TaskService.updateOrder(newTaskOrderList);
+                let updateOrderResponse = await TaskService.updateOrder(newTaskOrderList);
+
+                // @ts-ignore
+                this.taskDraggingOldBoardId = null;
+                // @ts-ignore
+                this.taskDraggingNewBoardId = null;
+
+                if (updateOrderResponse.Success) {
+                    // @ts-ignore
+                    SocketIoService.emit('updateBoard');
+                }
             } else {
                 // @ts-ignore
                 let oldBoardId = this.taskDraggingOldBoardId;
@@ -275,7 +319,7 @@ export default {
                 });
 
                 // @ts-ignore
-                await TaskService.updateOrder(newTaskOrderListForOldBoard);
+                let oldUpdateOrderResponse = await TaskService.updateOrder(newTaskOrderListForOldBoard);
 
                 let newBoard = null;
                 allBoards.forEach(function (board, index) {
@@ -304,29 +348,27 @@ export default {
                 });
 
                 // @ts-ignore
-                await TaskService.updateOrder(newTaskOrderListForNewBoard);
+                let newUpdateOrderResponse = await TaskService.updateOrder(newTaskOrderListForNewBoard);
+
+                // @ts-ignore
+                this.taskDraggingOldBoardId = null;
+                // @ts-ignore
+                this.taskDraggingNewBoardId = null;
+
+                if (
+                    oldUpdateOrderResponse.Success &&
+                    newUpdateOrderResponse.Success
+                ) {
+                    // @ts-ignore
+                    SocketIoService.emit('updateBoard');
+                }
             }
-
-            // @ts-ignore
-            this.taskDraggingOldBoardId = null;
-            // @ts-ignore
-            this.taskDraggingNewBoardId = null;
-
-            // // @ts-ignore
-            // this.boards = [];
-            // // @ts-ignore
-            // this.boards = await this.getAllBoards();
         },
     },
     components: {
         Heading,
         draggable: VueDraggableNext,
     },
-    setup() {
-        return {
-            getToken,
-            md5
-        }
-    }
+
 }
 </script>
